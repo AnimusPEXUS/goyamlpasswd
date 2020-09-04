@@ -1,0 +1,8 @@
+records:
+
+  - user: "u1"
+    key: "key1"
+    
+  - user: "u2"
+    key: "key2"
+

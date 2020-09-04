@@ -15,9 +15,9 @@ var (
 )
 
 type YAMLAuthFileSRecord struct {
-	User       string
-	Password   *string `yaml:",omitempty"`
-	UnifiedKey *string `yaml:",omitempty"`
+	User     string
+	Password *string `yaml:",omitempty"`
+	Key      *string `yaml:",omitempty"`
 }
 
 type YAMLAuthFileS struct {
@@ -74,7 +74,7 @@ func (self *YAMLAuthFile) Load() error {
 		return err
 	}
 
-	err = yaml.Unmarshal(data, self.data)
+	err = yaml.Unmarshal(data, &self.data)
 	if err != nil {
 		return err
 	}
@@ -105,11 +105,16 @@ func (self *YAMLAuthFile) Save() error {
 }
 
 func (self *YAMLAuthFile) PutRecord(r *YAMLAuthFileSRecord) {
+	found := false
 	for i := len(self.data.Records) - 1; i != -1; i += -1 {
 		if self.data.Records[i].User == r.User {
 			self.data.Records[i].Password = r.Password
-			self.data.Records[i].UnifiedKey = r.UnifiedKey
+			self.data.Records[i].Key = r.Key
+			found = true
 		}
+	}
+	if !found {
+		self.data.Records = append(self.data.Records, r)
 	}
 	return
 }
@@ -125,7 +130,10 @@ func (self *YAMLAuthFile) RemoveRecord(name string) {
 
 func (self *YAMLAuthFile) UserByKey(key string) (user string, err error) {
 	for i := len(self.data.Records) - 1; i != -1; i += -1 {
-		if *(self.data.Records[i].UnifiedKey) == key {
+		if self.data.Records[i].Key == nil {
+			continue
+		}
+		if *(self.data.Records[i].Key) == key {
 			return self.data.Records[i].User, nil
 		}
 	}
