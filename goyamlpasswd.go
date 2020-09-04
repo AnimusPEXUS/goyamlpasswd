@@ -21,7 +21,6 @@ type YAMLAuthFileSRecord struct {
 }
 
 type YAMLAuthFileS struct {
-	Enabled bool
 	Records []*YAMLAuthFileSRecord
 }
 
@@ -32,7 +31,11 @@ type YAMLAuthFile struct {
 }
 
 func NewYAMLAuthFile(filename string) *YAMLAuthFile {
-	return &YAMLAuthFile{filename: filename}
+	ret := &YAMLAuthFile{
+		filename: filename,
+		data:     &YAMLAuthFileS{},
+	}
+	return ret
 }
 
 func (self *YAMLAuthFile) LoadIfChanged() (bool, error) {
